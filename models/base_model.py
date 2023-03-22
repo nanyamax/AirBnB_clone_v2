@@ -6,7 +6,7 @@ This module defines the base class inherited by all other ORM classes
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, Integer, DateTime
 
 Base = declarative_base()
 
@@ -19,7 +19,7 @@ class BaseModel:
     created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
         self.id = str(uuid.uuid4())
         self.created_at = datetime.now()
@@ -48,17 +48,15 @@ class BaseModel:
         """Convert instance into dict format"""
         dictionary = {}
         dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
+        dictionary['__class__'] = self.__class__.__name__
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
-        dictionary.pop('_sa_instance_state', None)
+
+        if dictionary.get("_sa_instance_state"):
+            del dictionary["_sa_instance_state"]
         return dictionary
 
     def __str__(self):
         """Returns a string representation of the instance"""
-        attributes = {}
-        attributes.update(self.__dict__)
-        attributes.pop('_sa_instance_state', None)
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, attributes)
+        cls = (str(type(self)).split('.')[-1]).split('"')[0]
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
