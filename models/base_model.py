@@ -15,7 +15,7 @@ class BaseModel:
     """
     A base class for all hbnb models
     """
-    id = Column(String(60), unique=True, primary_key=True, nullable=False)
+    id = Column(String(60), primary_key=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
 
@@ -42,6 +42,10 @@ class BaseModel:
                 if key == "__class__":
                     continue
                 setattr(self, key, value)
+    def __str__(self):
+        """Returns a string representation of the instance"""
+        cls = (str(type(self)).split('.')[-1]).split('"')[0]
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
@@ -67,7 +71,3 @@ class BaseModel:
             del dictionary["_sa_instance_state"]
         return dictionary
 
-    def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('"')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
