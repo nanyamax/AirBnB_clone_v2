@@ -3,7 +3,7 @@
 """
 A module that defines the ORM class for User table
 """
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
