@@ -1,30 +1,24 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
-A Fabric script (based on the file 3-deploy_web_static.py)
-that deletes out-of-date archives, using the function do_clean
+Fabric script to delete out-of-date archives
 """
-import os
-from fabric.api import cd, env, local, run
 
-env.hosts = ["34.231.110.206", "3.239.57.196"]
+from fabric.api import *
+from os import path
 
+env.hosts = ['<IP web-01>', '<IP web-02>']
+env.user = 'ubuntu'
+env.key_filename = '/path/to/ssh/key'
 
 def do_clean(number=0):
     """
-    Deletes out-of-date archives
-    Args:
-        number: is the number of the archives, including the most recent
+    Deletes all unnecessary archives in the versions folder
+    Deletes all unnecessary archives in the /data/web_static/releases folder
     """
-    n = 1 if int(number) == 0 else int(number)
-    files = [f for f in os.listdir('./versions')]
-    files.sort(reverse=True)
-    for f in files[n:]:
-        local("rm -f versions/{}".format(f))
-    remote = "/data/web_static/releases/"
-    with cd(remote):
-        tgz = run(
-            "ls -tr | grep -E '^web_static_([0-9]{6,}){1}$'"
-        ).split()
-        tgz.sort(reverse=True)
-        for d in tgz[n:]:
-            run("rm -rf {}{}".format(remote, d))
+    number = int(number)
+    if number < 1:
+        number = 1
+    with lcd('./versions'):
+        local('ls -t | tail -n +{} | xargs rm -rf --'.format(number + 1))
+    with cd('/data/web_static/releases'):
+        run('ls -t | tail -n +{} | xargs rm -rf --'.format(number + 1))
