@@ -10,5 +10,5 @@ echo '<html><head></head><body>Holberton School</body></html>' > /data/web_stati
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 sudo chown -R ubuntu:ubuntu /data/
 # Update Nginx config to serve web_static files
-sudo sed -i '51 i \\\n\tlocation /hbnb_static {\n\talias /data/web_static/current;\n\t}' /etc/nginx/sites-available/default
-service nginx restart
+sudo sed -i "37i \\\tlocation \/hbnb_static {\n\t\talias /data/web_static/current;\n\t}\n" /etc/nginx/sites-available/default
+sudo service nginx restart
